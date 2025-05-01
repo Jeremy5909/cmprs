@@ -1,4 +1,4 @@
-#include "msker.c"
+#include "msker.h"
 #include <stdio.h>
 
 int main(int argc, char **argv) {
