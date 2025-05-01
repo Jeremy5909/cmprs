@@ -60,3 +60,5 @@ dkms.conf
 *.old
 *.new
 .DS_Store
+obj/
+bin/
