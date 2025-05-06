@@ -17,8 +17,11 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  mskgen("deadbeefcafebabe", input_file);
+  // Change file
+  mskgen("c4dfafda6ae770205ae80ee0f15044f1d31ba4660da52560f002b53ed41d6d39",
+         input_file);
 
+  // Close it
   fclose(input_file);
   return 0;
 }
