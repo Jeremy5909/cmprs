@@ -1,0 +1,24 @@
+TODO:
+	1. Everything
+	2. Is ts memory safe
+	3. Test of msker
+	4. Figure out LZMA implementation
+		- XZ, bzip, gzip etc?
+		- Write own?
+		- Use code from one of above project in our own way
+	4. More testing
+	5. Make it compress and uncompress
+	6. shafile implementation
+	7. Make user friendly
+		- automatically stops when it is small enough
+		- target sizes
+		- multithread???
+		- Tie shafile to the end of the .cmprs file so u dont need 2 files
+			- Make this optional so it could be "password protected"
+		- ETAs
+	8. TESTING AGAIN
+
+Questions:
+	Should the final shasum be the shasum for the target file/tar?
+	How do we make this efficient?
+	SHould we try my compression idea later? - andrew
