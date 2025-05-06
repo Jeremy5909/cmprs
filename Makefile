@@ -8,7 +8,7 @@ OBJ_DIR = obj
 BIN_DIR = bin
 
 # Target executable
-TARGET = $(BIN_DIR)/main
+TARGET = $(BIN_DIR)/mskertest
 
 # Automatically find all .c files and generate matching .o files
 SOURCES = $(wildcard $(SRC_DIR)/*.c)
