@@ -1,5 +1,7 @@
 TODO:
 	1. Everything
+		- should defininitely change buffer size from a byte, im thinking 16 kb, maybe is dynamic based on system specs...
+		- L3 cache should be able to fit it all
 	2. Is ts memory safe
 	3. Test of msker
 	4. Figure out LZMA implementation
