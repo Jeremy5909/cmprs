@@ -14,7 +14,6 @@ long get_file_size(FILE *fp) {
 }
 
 uint32_t prng_seed(const char *hash) {
-  // Takes first 8 hex characters of hash and convert to seed
   char buf[9] = {0};
   strncpy(buf, hash, 8);
   return (uint32_t)strtoul(buf, NULL, 16);
@@ -28,30 +27,50 @@ void prng_next(uint32_t *prng_state) {
 
 void mskgen(const char *hash, FILE *file) {
   long file_size = get_file_size(file);
-
   uint32_t prng_state = prng_seed(hash);
 
-  for (long i = 0; i < file_size; i++) {
-    uint8_t byte;
+  const size_t buffer_size = 16384; // 16 KB
+  uint8_t *buffer = malloc(buffer_size);
+  if (!buffer) {
+    printf("Failed to allocate buffer\n");
+    return;
+  }
 
-    if (fread(&byte, 1, 1, file) != 1) {
-      printf("Failed to read byte at position %ld\n", i);
+  long processed = 0;
+  while (processed < file_size) {
+    size_t to_read = (file_size - processed) > buffer_size
+                         ? buffer_size
+                         : (file_size - processed);
+    size_t bytes_read = fread(buffer, 1, to_read, file);
+    if (bytes_read != to_read) {
+      printf("Failed to read chunk at position %ld\n", processed);
       break;
     }
 
-    prng_next(&prng_state);
-
-    // Keep last 8 bits
-    uint8_t mask = prng_state & 0xFF;
-
-    for (int j = 0; j < 8; j++) {
-      if (((mask >> (7 - j)) & 1) == 0) {
-        byte ^= (1 << (7 - j));
+    for (size_t i = 0; i < bytes_read; i++) {
+      prng_next(&prng_state);
+      uint8_t mask = prng_state & 0xFF;
+      for (int j = 0; j < 8; j++) {
+        if (((mask >> (7 - j)) & 1) == 0) {
+          buffer[i] ^= (1 << (7 - j));
+        }
       }
     }
 
-    fseek(file, -1, SEEK_CUR);
-    fwrite(&byte, 1, 1, file);
+    if (fseek(file, -bytes_read, SEEK_CUR) != 0) {
+      printf("Failed to seek back for chunk at position %ld\n", processed);
+      break;
+    }
+
+    size_t bytes_written = fwrite(buffer, 1, bytes_read, file);
+    if (bytes_written != bytes_read) {
+      printf("Failed to write chunk at position %ld\n", processed);
+      break;
+    }
+
     fflush(file);
+    processed += bytes_read;
   }
+
+  free(buffer);
 }
