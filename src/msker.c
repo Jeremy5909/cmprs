@@ -44,11 +44,8 @@ void mskgen(const char *hash, FILE *file) {
     // Keep last 8 bits
     uint8_t mask = prng_state & 0xFF;
 
-    for (int j = 0; j < 8; j++) {
-      if (((mask >> (7 - j)) & 1) == 0) {
-        byte ^= (1 << (7 - j));
-      }
-    }
+    // Flip bit if corresponding bit in mask is 0
+    byte ^= ~mask;
 
     fseek(file, -1, SEEK_CUR);
     fwrite(&byte, 1, 1, file);
