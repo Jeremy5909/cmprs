@@ -56,7 +56,7 @@ dkms.conf
 
 # Project custom
 *.bin
-.cache/
+.cache/*
 *test*
 *.old*
 *.new*
