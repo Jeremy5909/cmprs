@@ -62,7 +62,9 @@ dkms.conf
 .DS_Store
 obj/
 bin/
+utils/
 .dmg
 .tar
 .xz
 test_assets/
+compile_commands.json
