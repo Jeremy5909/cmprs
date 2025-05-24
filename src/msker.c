@@ -63,7 +63,6 @@ void mskgen(const char *hash, FILE *file) {
     size_t to_read = (file_size - processed) > chunk_size
                          ? chunk_size
                          : (file_size - processed);
-
     // Read -> Encrypt -> Write back
     fread(buffer, 1, to_read, file);
     int out_len;
@@ -71,6 +70,7 @@ void mskgen(const char *hash, FILE *file) {
     fseek(file, -to_read, SEEK_CUR);
     fwrite(buffer, 1, to_read, file);
     processed += to_read;
+
   }
 
   EVP_CIPHER_CTX_free(ctx);

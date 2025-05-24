@@ -1,8 +1,8 @@
-# Compiler and flags
 CC = gcc
 CFLAGS = -Wall -Wextra -O3
 LDFLAGS := $(shell pkg-config --libs openssl libsodium)
 OPENSSL_INC := $(shell pkg-config --cflags openssl libsodium)
+
 
 # Directories
 SRC_DIR = src
@@ -36,3 +36,4 @@ clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
 
 .PHONY: all clean
+
