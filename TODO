@@ -26,3 +26,9 @@ Questions:
 	Should the final shasum be the shasum for the target file/tar?
 	How do we make this efficient?
 	SHould we try my compression idea later? - andrew
+
+
+
+
+
+IGONORE EVERYTHING ABOVE, WE NEED TO FIGURE OUT HOW TO REDUCE ENTROPY!!!!!!

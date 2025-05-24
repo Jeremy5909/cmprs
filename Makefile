@@ -9,29 +9,32 @@ SRC_DIR = src
 OBJ_DIR = obj
 BIN_DIR = bin
 
-# Target executable
-TARGET = $(BIN_DIR)/mskertst
+# Targets
+TARGETS = $(BIN_DIR)/ncrypt $(BIN_DIR)/dcrypt $(BIN_DIR)/mskertst
+COMMON_OBJ = $(OBJ_DIR)/msker.o
 
-# Automatically find all .c files and generate matching .o files
-SOURCES = $(wildcard $(SRC_DIR)/*.c)
-OBJECTS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SOURCES))
-
-# Default target
 .DEFAULT_GOAL := all
 
-all: $(TARGET)
+all: $(TARGETS)
 
-# Link executable
-$(TARGET): $(OBJECTS)
+# Build each target with msker.o
+$(BIN_DIR)/ncrypt: $(OBJ_DIR)/ncrypt.o $(COMMON_OBJ)
 	@mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) $(OPENSSL_INC) $(OBJECTS) $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(OPENSSL_INC) $^ $(LDFLAGS) -o $@
 
-# Compile .c to .o
+$(BIN_DIR)/dcrypt: $(OBJ_DIR)/dcrypt.o $(COMMON_OBJ)
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) $(OPENSSL_INC) $^ $(LDFLAGS) -o $@
+
+$(BIN_DIR)/mskertst: $(OBJ_DIR)/mskertst.o $(COMMON_OBJ)
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) $(OPENSSL_INC) $^ $(LDFLAGS) -o $@
+
+# Compile .c files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(OPENSSL_INC) -c $< -o $@
 
-# Clean up
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
 

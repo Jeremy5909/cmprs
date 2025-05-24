@@ -69,3 +69,4 @@ utils/
 *.xz
 test_assets/
 compile_commands.json
+shasum-*
