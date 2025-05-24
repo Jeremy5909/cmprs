@@ -1,7 +1,8 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -O3
-LDFLAGS := $(shell pkg-config --libs openssl)
-OPENSSL_INC := $(shell pkg-config --cflags openssl)
+LDFLAGS := $(shell pkg-config --libs openssl libsodium)
+OPENSSL_INC := $(shell pkg-config --cflags openssl libsodium)
+
 
 # Directories
 SRC_DIR = src

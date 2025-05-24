@@ -1,4 +1,5 @@
 #include "msker.h"
+#include <openssl/evp.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -6,6 +7,7 @@
 #include <string.h>
 #include <sys/mman.h>
 
+// Nukes the whithouse
 long get_file_size(FILE *fp) {
   fseek(fp, 0, SEEK_END);
   long sz = ftell(fp);
@@ -13,11 +15,25 @@ long get_file_size(FILE *fp) {
   return sz;
 }
 
+// Convert full SHA256 hex string to 32-byte binary
+static void hex_to_binary(const char *hex, uint8_t *bin) {
+  for (int i = 0; i < 32; i++) {
+    sscanf(hex + 2 * i, "%2hhx", &bin[i]);
+  }
+}
+
 uint32_t prng_seed(const char *hash) {
-  // Takes first 8 hex characters of hash and convert to seed
-  char buf[9] = {0};
-  strncpy(buf, hash, 8);
-  return (uint32_t)strtoul(buf, NULL, 16);
+  uint8_t bin_hash[32];
+  hex_to_binary(hash, bin_hash);
+
+  // Mix all 32 bytes using XOR-folding
+  uint32_t seed = 0;
+  for (int i = 0; i < 8; i++) {
+    uint32_t chunk;
+    memcpy(&chunk, bin_hash + i * 4, 4);
+    seed ^= chunk;
+  }
+  return seed;
 }
 
 void prng_next(uint32_t *prng_state) {
@@ -28,27 +44,35 @@ void prng_next(uint32_t *prng_state) {
 
 void mskgen(const char *hash, FILE *file) {
   long file_size = get_file_size(file);
+  const size_t chunk_size = 16384; // 16KB
+  uint8_t *buffer = malloc(chunk_size);
 
-  uint32_t prng_state = prng_seed(hash);
+  // Convert SHA256 to 256-bit key
+  uint8_t key[32];
+  hex_to_binary(hash, key);
 
-  for (long i = 0; i < file_size; i++) {
-    uint8_t byte;
+  // Fixed nonce for reproducibility (12 bytes) + counter (4 bytes)
+  uint8_t nonce_counter[16] = {0}; // All zeros
 
-    if (fread(&byte, 1, 1, file) != 1) {
-      printf("Failed to read byte at position %ld\n", i);
-      break;
-    }
+  // Initialize ChaCha20 context
+  EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+  EVP_EncryptInit_ex(ctx, EVP_chacha20(), NULL, key, nonce_counter);
 
-    prng_next(&prng_state);
+  long processed = 0;
+  while (processed < file_size) {
+    size_t to_read = (file_size - processed) > chunk_size
+                         ? chunk_size
+                         : (file_size - processed);
+    // Read -> Encrypt -> Write back
+    fread(buffer, 1, to_read, file);
+    int out_len;
+    EVP_EncryptUpdate(ctx, buffer, &out_len, buffer, to_read);
+    fseek(file, -to_read, SEEK_CUR);
+    fwrite(buffer, 1, to_read, file);
+    processed += to_read;
 
-    // Keep last 8 bits
-    uint8_t mask = prng_state & 0xFF;
-
-    // Flip bit if corresponding bit in mask is 0
-    byte ^= ~mask;
-
-    fseek(file, -1, SEEK_CUR);
-    fwrite(&byte, 1, 1, file);
-    fflush(file);
   }
+
+  EVP_CIPHER_CTX_free(ctx);
+  free(buffer);
 }

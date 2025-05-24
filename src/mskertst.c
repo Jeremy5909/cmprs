@@ -18,11 +18,9 @@ int main(int argc, char **argv) {
   }
 
   // Change file
-  mskgen("c4dfafda6ae770205ae80ee0f15044f1d31ba4660da52560f002b53ed41d6d39",
-         input_file);
+  mskgen("76ba652cbd2ef1931d0546ac1c9d8f12d21c81fad272b754975a0b1561dda275", input_file);
 
   // Close it
   fclose(input_file);
   return 0;
 }
-

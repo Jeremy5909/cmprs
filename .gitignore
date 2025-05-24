@@ -55,13 +55,17 @@ dkms.conf
 
 
 # Project custom
-.bin
+*.bin
+.cache/*
 *test*
-*.old
-*.new
+*.old*
+*.new*
 .DS_Store
 obj/
 bin/
-.dmg
-.tar
-.xz
+utils/
+*.dmg
+*.tar
+*.xz
+test_assets/
+compile_commands.json
